@@ -1,6 +1,5 @@
-﻿<h3>GenericList</h3>
-@typeparam Titem
-{
+﻿@typeparam Titem
+
 @if (MyList is null)
 {
     @if (Loading is null)
@@ -32,11 +31,11 @@ else
     }
     else
     {
-    @Body    
+        @Body
     }
 
 }
-        @code {
+@code {
     [Parameter]
     public RenderFragment? Loading { get; set; }
 

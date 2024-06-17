@@ -1,14 +1,23 @@
-﻿@page "/countries"
-@using Sales.Shared.Entities;
-@using Sales.WEB.Repositories;
+﻿@using Sales.Shared.Entities
+@using Sales.WEB.Repositories
+
+@page "/countries"
 @inject IRepository Repository
 
-<h3>Paises</h3>
+<h3> Paises </h3>
 
+<a class="btn btn-primary" href="/countries/create"> Nuevo País </a>
 
 <GenericList MyList="Countries">
 
+    <Loading>
+
+        <p> Cargando... </p>
+
+    </Loading>
+
     <Body>
+
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -17,6 +26,7 @@
                 </tr>
             </thead>
             <tbody>
+
                 @foreach (var country in Countries!)
                 {
                     <tr>
@@ -27,9 +37,11 @@
                         <td>
 
                             @country.Name
+
                         </td>
                     </tr>
                 }
+
             </tbody>
         </table>
 
@@ -40,11 +52,12 @@
 
 
 @code {
-    public IList<Country>? Countries { get; set; }
+    public List<Country>? Countries { get; set; }
+
     protected async override Task OnInitializedAsync()
     {
         var responseHppt = await Repository.Get<List<Country>>("api/countries");
         Countries = responseHppt.Response!;
     }
 
-}
+}   
