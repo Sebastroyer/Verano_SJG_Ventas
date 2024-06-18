@@ -4,17 +4,14 @@
 @page "/countries"
 @inject IRepository Repository
 
+@inject NavigationManager navigationManager
+@inject SweetAlertService sweetAlertService
+
 <h3> Paises </h3>
 
 <a class="btn btn-primary" href="/countries/create"> Nuevo País </a>
 
 <GenericList MyList="Countries">
-
-    <Loading>
-
-        <p> Cargando... </p>
-
-    </Loading>
 
     <Body>
 
@@ -31,8 +28,8 @@
                 {
                     <tr>
                         <td>
-                            <a class="btn btn-warning">Editar</a>
-                            <button class="btn btn-danger">Borrar</button>
+                            <a class="btn btn-warning" href="/countries/edit/@country.Id">Editar</a>
+                            <button class="btn btn-danger" @onclick=@(()=> DeleteAsync(country.Id))>Borrar</button>
                         </td>
                         <td>
 
@@ -56,8 +53,41 @@
 
     protected async override Task OnInitializedAsync()
     {
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
         var responseHppt = await Repository.Get<List<Country>>("api/countries");
         Countries = responseHppt.Response!;
     }
 
+    private async Task DeleteAsync(int id)
+    {
+        var result = await sweetAlertService.FireAsync(new SweetAlertOptions
+            {
+                Title = "Confirmación",
+                Text = "¿Deseas eliminar el registro?",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                CancelButtonText = "No",
+                ConfirmButtonText = "Zi",
+            });
+        var confirm = string.IsNullOrEmpty(result.Value);
+        if (confirm)
+        {
+            return;
+        }
+        var responseHttp = await Repository.Delete($"/api/countries/{id}");
+        if (responseHttp.Error)
+        {
+            if (responseHttp.HttpResponseMessage.StatusCode != HttpStatusCode.NotFound)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync("error", message, SweetAlertIcon.Error);
+                return;
+            }
+        }
+        await LoadAsync();
+    }
 }   

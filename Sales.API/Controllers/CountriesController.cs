@@ -49,7 +49,7 @@ namespace Sales.API.Controllers
             return Ok(country);
         }
 
-        [HttpDelete]
+        [HttpDelete ("{id:int}")]
         public async Task<ActionResult> DeleteAsync(int id)
         {
            var country = await _context.Countries.FirstOrDefaultAsync( x => x.Id == id);
