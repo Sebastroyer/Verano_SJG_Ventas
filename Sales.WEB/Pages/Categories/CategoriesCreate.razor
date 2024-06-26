@@ -1,0 +1,36 @@
+﻿@using Sales.WEB
+@using Sales.Shared.Entities
+@using Sales.WEB.Repositories
+@page "/categories/create"
+@inject IRepository Repository
+
+@inject NavigationManager navigationManager
+@inject SweetAlertService sweetAlertService
+
+<h3>Crear Categoria</h3>
+
+<CategoryForm @ref="categoryForm" Category="category" OnValidSubmit="Create" ReturnAction="Return" />
+
+@code {
+    private Category category = new();
+    private CategoryForm? categoryForm;
+
+    private async Task Create()
+    {
+        var httpResponse = await Repository.Post("/api/categories", category);
+        if (httpResponse.Error)
+        {
+            var message = await httpResponse.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message);
+            return;
+        }
+
+        categoryForm!.FormPostedSuccessfully = true;
+
+        navigationManager.NavigateTo("/categories");
+    }
+    private void Return()
+    {
+        navigationManager.NavigateTo("/categories");
+    }
+}
